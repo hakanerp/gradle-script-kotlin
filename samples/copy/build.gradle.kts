@@ -29,3 +29,19 @@ task<Copy>("initConfig") {
 task<Delete>("clean") {
     delete(buildDir)
 }
+
+// Test task used for integration testing
+tasks {
+    "testSample" {
+        dependsOn("initConfig")
+        doLast {
+            val target = "build/target/config"
+            listOf(file("$target/copy.data"), file("$target/copy.xml")).forEach {
+                require(it.exists(), { "File was not copied $it" })
+            }
+            listOf(file("$target/copy.bak"), file("$target/copy.txt")).forEach {
+                require(!it.exists(), { "File was copied but should not have $it" })
+            }
+        }
+    }
+}

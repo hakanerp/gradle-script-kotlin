@@ -73,3 +73,15 @@ open class Greeting : DefaultTask() {
         outputFiles.forEach { it.writeText(message) }
     }
 }
+
+// Test task used for integration testing
+tasks {
+    "testSample" {
+        dependsOn("hello")
+        doLast {
+            listOf(file("build/a.txt"), file("build/b.txt")).forEach {
+                require(it.readText() == "Hi from Gradle", { "Message was not written into $it" })
+            }
+        }
+    }
+}

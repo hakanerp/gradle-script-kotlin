@@ -174,7 +174,9 @@ val isCI by lazy {
 //
 //     check-hello-kotlin
 //
-val samplesWithTestTask = emptyList<String>()
+val samplesWithTestTask = listOf(
+    "lazily-evaluated-properties",
+    "copy")
 tasks.addRule("Pattern: check-<SAMPLE>") {
     val taskName = this
     if (taskName.startsWith("check-")) {
