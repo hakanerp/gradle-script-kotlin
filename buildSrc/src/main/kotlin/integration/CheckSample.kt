@@ -42,6 +42,9 @@ open class CheckSample : DefaultTask() {
     @get:Input
     var additionalGradleArguments = emptyList<String>()
 
+    @get:Input
+    var taskNames = listOf("tasks")
+
     @Suppress("unused")
     @get:InputFiles
     val inputFiles: FileCollection by lazy {
@@ -62,7 +65,7 @@ open class CheckSample : DefaultTask() {
     fun run() {
         withDaemonRegistry(customDaemonRegistry()) {
             outputFile.outputStream().use { stdout ->
-                runGradleHelpOn(sampleDir!!, stdout)
+                runBuild(sampleDir!!, stdout)
             }
         }
     }
@@ -76,12 +79,12 @@ open class CheckSample : DefaultTask() {
         get() = project.buildDir
 
     private
-    fun runGradleHelpOn(projectDir: File, stdout: FileOutputStream) {
+    fun runBuild(projectDir: File, stdout: FileOutputStream) {
         withConnectionFrom(connectorFor(projectDir).useInstallation(installation!!)) {
             newBuild()
                 .withArguments(
                     listOf("--recompile-scripts", "--stacktrace") + additionalGradleArguments)
-                .forTasks("tasks")
+                .forTasks(*taskNames.toTypedArray())
                 .setStandardOutput(TeeOutputStream(System.out, stdout))
                 .setStandardError(TeeOutputStream(System.err, stdout))
                 .run()

@@ -174,13 +174,18 @@ val isCI by lazy {
 //
 //     check-hello-kotlin
 //
+val samplesWithTestTask = emptyList<String>()
 tasks.addRule("Pattern: check-<SAMPLE>") {
     val taskName = this
     if (taskName.startsWith("check-")) {
         val checkSample = task<integration.CheckSample>("$taskName-task") {
             dependsOn(customInstallation)
             installation = customInstallationDir
-            sampleDir = file("samples/${taskName.removePrefix("check-")}")
+            val sampleName = taskName.removePrefix("check-")
+            sampleDir = file("samples/$sampleName")
+            if(sampleName in samplesWithTestTask) {
+                taskNames = listOf("testSample")
+            }
             if (isCI) {
                 additionalGradleArguments = listOf("-d", "-Dkotlin-daemon.verbose=true")
             }
